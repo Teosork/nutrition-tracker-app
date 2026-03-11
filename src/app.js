@@ -5,9 +5,16 @@ console.log("Barcodes:", barcodes);
 console.log("Daily Targets:", dailyTargets);
 
 const productData = await fetchProduct(barcodes[0]);
-console.log("Nutriments:", productData.product.nutriments);
-console.log("Product Name:", productData.product.product_name);
-console.log("Kcal per 100g:", productData.product.nutriments["energy-kcal_100g"]);
-console.log("Fat per 100g:", productData.product.nutriments.fat_100g);
-console.log("Carbs per 100g:", productData.product.nutriments.carbohydrates_100g);
-console.log("Protein per 100g:", productData.product.nutriments.proteins_100g);
+
+function extractProductData(productData) {
+    return {
+        name: productData.product?.product_name,
+        kcal: productData.product?.nutriments?.["energy-kcal_100g"],
+        fat: productData.product?.nutriments?.fat_100g,
+        carbs: productData.product?.nutriments?.carbohydrates_100g,
+        protein: productData.product?.nutriments?.proteins_100g,
+    };
+}
+
+const product = extractProductData(productData);
+console.log(product);
