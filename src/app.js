@@ -4,7 +4,7 @@ import { fetchProduct } from "./api.js";
 console.log("Barcodes:", barcodes);
 console.log("Daily Targets:", dailyTargets);
 
-const productData = await fetchProduct(barcodes[0]);
+const  products = [];
 
 function extractProductData(productData) {
     return {
@@ -16,5 +16,14 @@ function extractProductData(productData) {
     };
 }
 
-const product = extractProductData(productData);
-console.log(product);
+for (const barcode of barcodes){
+    console.log(barcode);
+    try {
+    const productData = await fetchProduct(barcode);
+    const product = extractProductData(productData);
+    products.push(product);
+    } catch (error){
+    console.error('An error occurred while fetching data: ', error.message);    
+    }
+}
+console.log(products);
