@@ -13,6 +13,10 @@ function extractProductData(productData) {
         fat: productData.product?.nutriments?.fat_100g,
         carbs: productData.product?.nutriments?.carbohydrates_100g,
         protein: productData.product?.nutriments?.proteins_100g,
+        nutritionDataPer: productData.product?.nutrition_data_per,
+        servingSize: productData.product?.serving_size,
+        servingQuantity: productData.product?.serving_quantity,
+        grams: 0
     };
 }
 
@@ -26,6 +30,14 @@ for (const barcode of barcodes){
     console.error('An error occurred while fetching data: ', error.message);    
     }
 }
+
+for (const product of products) {
+    product.calculatedKcal = ((product.kcal || 0) * product.grams) / 100;
+    product.calculatedFat = ((product.fat || 0) * product.grams) / 100;
+    product.calculatedCarbs = ((product.carbs || 0) * product.grams) / 100;
+    product.calculatedProtein = ((product.protein || 0) * product.grams) / 100;
+}
+
 console.log(products);
 
 const mealTotals = {
@@ -36,10 +48,10 @@ const mealTotals = {
 }
 
 for (const product of products){
-    mealTotals.kcal += product.kcal || 0;
-    mealTotals.fat += product.fat || 0;
-    mealTotals.carbs += product.carbs || 0;
-    mealTotals.protein += product.protein || 0;
+    mealTotals.kcal += product.calculatedKcal || 0;
+    mealTotals.fat += product.calculatedFat || 0;
+    mealTotals.carbs += product.calculatedCarbs || 0;
+    mealTotals.protein += product.calculatedProtein || 0;
 }
 console.log(mealTotals);
 
