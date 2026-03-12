@@ -5,6 +5,7 @@ console.log("Barcodes:", barcodes);
 console.log("Daily Targets:", dailyTargets);
 
 const products = [];
+const failedBarcodes = [];
 
 function extractProductData(productData) {
     return {
@@ -27,9 +28,12 @@ for (const barcode of barcodes){
     const product = extractProductData(productData);
     products.push(product);
     } catch (error){
+    failedBarcodes.push(barcode);
     console.error('An error occurred while fetching data: ', error.message);    
     }
 }
+
+console.log("Failed barcodes:", failedBarcodes);
 
 for (const product of products) {
     product.calculatedKcal = ((product.kcal || 0) * product.grams) / 100;
