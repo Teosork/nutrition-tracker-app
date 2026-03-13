@@ -1,5 +1,7 @@
-import {barcodes, dailyTargets} from "./data.js";
+import { barcodes, dailyTargets } from "./data.js";
 import { fetchProduct } from "./api.js";
+import { renderProducts, renderMissingProducts, renderTotals, renderTargets} from "./ui.js";
+
 
 console.log("Barcodes:", barcodes);
 console.log("Daily Targets:", dailyTargets);
@@ -17,7 +19,7 @@ function extractProductData(productData) {
         nutritionDataPer: productData.product?.nutrition_data_per,
         servingSize: productData.product?.serving_size,
         servingQuantity: productData.product?.serving_quantity,
-        grams: 0
+        grams: 100
     };
 }
 
@@ -32,7 +34,7 @@ for (const barcode of barcodes){
     console.error('An error occurred while fetching data: ', error.message);    
     }
 }
-
+renderMissingProducts(failedBarcodes);
 console.log("Failed barcodes:", failedBarcodes);
 
 for (const product of products) {
@@ -41,7 +43,7 @@ for (const product of products) {
     product.calculatedCarbs = ((product.carbs || 0) * product.grams) / 100;
     product.calculatedProtein = ((product.protein || 0) * product.grams) / 100;
 }
-
+renderProducts(products);
 console.log(products);
 
 const mealTotals = {
@@ -57,6 +59,8 @@ for (const product of products){
     mealTotals.carbs += product.calculatedCarbs || 0;
     mealTotals.protein += product.calculatedProtein || 0;
 }
+
+renderTotals(mealTotals);
 console.log(mealTotals);
 
 const remainingTargets = {
@@ -65,4 +69,5 @@ const remainingTargets = {
     carbs: dailyTargets.carbs - mealTotals.carbs,
     protein: dailyTargets.protein - mealTotals.protein
 }
+renderTargets(dailyTargets, remainingTargets);
 console.log(remainingTargets);
