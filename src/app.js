@@ -12,9 +12,6 @@ function extractProductData(productData) {
         fat: productData.product?.nutriments?.fat_100g,
         carbs: productData.product?.nutriments?.carbohydrates_100g,
         protein: productData.product?.nutriments?.proteins_100g,
-        nutritionDataPer: productData.product?.nutrition_data_per,
-        servingSize: productData.product?.serving_size,
-        servingQuantity: productData.product?.serving_quantity,
         grams: 0
     };
 }
@@ -47,7 +44,7 @@ const mealTotals = {
     fat: 0,
     carbs: 0,
     protein: 0
-}
+};
 
 function calculateMealTotals(products, mealTotals) {
     mealTotals.kcal = 0;
