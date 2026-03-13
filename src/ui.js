@@ -56,10 +56,10 @@ export function renderTotals(mealTotals){
     productsTotals.innerHTML = "";
     const totalNutriments = document.createElement("p");
     totalNutriments.textContent = 
-    `Kcal: ${mealTotals.kcal || 0}, 
-    Fat: ${mealTotals.fat || 0}g,
-    Carbs: ${mealTotals.carbs || 0}g,
-    Protein: ${mealTotals.protein || 0}g`;
+    `Kcal: ${formatNumber(mealTotals.kcal)}, 
+    Fat: ${formatNumber(mealTotals.fat)}g,
+    Carbs: ${formatNumber(mealTotals.carbs)}g,
+    Protein: ${formatNumber(mealTotals.protein)}g`;
     productsTotals.append(totalNutriments);
 }
 
