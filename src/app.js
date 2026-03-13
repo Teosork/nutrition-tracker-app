@@ -2,10 +2,6 @@ import { barcodes, dailyTargets } from "./data.js";
 import { fetchProduct } from "./api.js";
 import { renderProducts, renderMissingProducts, renderTotals, renderTargets} from "./ui.js";
 
-
-console.log("Barcodes:", barcodes);
-console.log("Daily Targets:", dailyTargets);
-
 const products = [];
 const failedBarcodes = [];
 
@@ -19,12 +15,11 @@ function extractProductData(productData) {
         nutritionDataPer: productData.product?.nutrition_data_per,
         servingSize: productData.product?.serving_size,
         servingQuantity: productData.product?.serving_quantity,
-        grams: 100
+        grams: 0
     };
 }
 
 for (const barcode of barcodes){
-    console.log(barcode);
     try {
     const productData = await fetchProduct(barcode);
     const product = extractProductData(productData);
@@ -35,16 +30,17 @@ for (const barcode of barcodes){
     }
 }
 renderMissingProducts(failedBarcodes);
-console.log("Failed barcodes:", failedBarcodes);
 
-for (const product of products) {
+function calculateProductNutrition(product) {
     product.calculatedKcal = ((product.kcal || 0) * product.grams) / 100;
     product.calculatedFat = ((product.fat || 0) * product.grams) / 100;
     product.calculatedCarbs = ((product.carbs || 0) * product.grams) / 100;
     product.calculatedProtein = ((product.protein || 0) * product.grams) / 100;
 }
-renderProducts(products);
-console.log(products);
+
+for (const product of products) {
+    calculateProductNutrition(product);
+}
 
 const mealTotals = {
     kcal: 0,
@@ -53,21 +49,40 @@ const mealTotals = {
     protein: 0
 }
 
-for (const product of products){
-    mealTotals.kcal += product.calculatedKcal || 0;
-    mealTotals.fat += product.calculatedFat || 0;
-    mealTotals.carbs += product.calculatedCarbs || 0;
-    mealTotals.protein += product.calculatedProtein || 0;
-}
+function calculateMealTotals(products, mealTotals) {
+    mealTotals.kcal = 0;
+    mealTotals.fat = 0;
+    mealTotals.carbs = 0;
+    mealTotals.protein = 0;
 
-renderTotals(mealTotals);
-console.log(mealTotals);
+    for (const product of products) {
+        mealTotals.kcal += product.calculatedKcal || 0;
+        mealTotals.fat += product.calculatedFat || 0;
+        mealTotals.carbs += product.calculatedCarbs || 0;
+        mealTotals.protein += product.calculatedProtein || 0;
+    }
+}
 
 const remainingTargets = {
-    kcal: dailyTargets.kcal - mealTotals.kcal,
-    fat: dailyTargets.fat - mealTotals.fat,
-    carbs: dailyTargets.carbs - mealTotals.carbs,
-    protein: dailyTargets.protein - mealTotals.protein
+    kcal: 0,
+    fat: 0,
+    carbs: 0,
+    protein: 0
+};
+
+function calculateRemainingTargets(dailyTargets, mealTotals, remainingTargets) {
+    remainingTargets.kcal = dailyTargets.kcal - mealTotals.kcal;
+    remainingTargets.fat = dailyTargets.fat - mealTotals.fat;
+    remainingTargets.carbs = dailyTargets.carbs - mealTotals.carbs;
+    remainingTargets.protein = dailyTargets.protein - mealTotals.protein;
 }
-renderTargets(dailyTargets, remainingTargets);
-console.log(remainingTargets);
+
+function updateSummary() {
+    calculateMealTotals(products, mealTotals);
+    renderTotals(mealTotals);
+    calculateRemainingTargets(dailyTargets, mealTotals, remainingTargets);
+    renderTargets(dailyTargets, remainingTargets);
+}
+
+updateSummary();
+renderProducts(products, calculateProductNutrition, updateSummary);

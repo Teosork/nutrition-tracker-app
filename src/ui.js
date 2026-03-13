@@ -1,4 +1,4 @@
-export function renderProducts(products){
+export function renderProducts(products,calculateProductNutrition, updateSummary){
     const myProducts = document.getElementById("products");
 
     for (const product of products) {
@@ -11,9 +11,30 @@ export function renderProducts(products){
         Fat: ${product.fat || 0}g,
         Carbs: ${product.carbs || 0}g,
         Protein: ${product.protein || 0}g`;
-        const productUserGrams = document.createElement("p");
-        productUserGrams.textContent = `Grams used: ${product.grams}`;
-        productCard.append(productName, productNutriments, productUserGrams);
+        const productCalculatedNutriments = document.createElement("p");
+        productCalculatedNutriments.textContent =
+        `Kcal: ${product.calculatedKcal || 0}, 
+        Fat: ${product.calculatedFat || 0}g,
+        Carbs: ${product.calculatedCarbs || 0}g,
+        Protein: ${product.calculatedProtein || 0}g`;
+        const productUserGrams = document.createElement("label");
+        productUserGrams.textContent = "Grams used: ";
+        const productUserGramsInput = document.createElement("input");
+        productUserGramsInput.type = "number";
+        productUserGramsInput.value = product.grams;
+        productUserGramsInput.addEventListener("input", function () {
+            product.grams = Number(productUserGramsInput.value);
+            calculateProductNutrition(product);
+            updateSummary();
+            productCalculatedNutriments.textContent =
+            `Kcal: ${product.calculatedKcal || 0}, 
+            Fat: ${product.calculatedFat || 0}g,
+            Carbs: ${product.calculatedCarbs || 0}g,
+            Protein: ${product.calculatedProtein || 0}g`;
+        });
+
+        productUserGrams.append(productUserGramsInput);
+        productCard.append(productName, productNutriments, productCalculatedNutriments, productUserGrams);
         myProducts.append(productCard);
     }
 }
@@ -31,7 +52,8 @@ export function renderMissingProducts(failedBarcodes){
 }
 
 export function renderTotals(mealTotals){
-    const productsTotals = document.getElementById("totals")
+    const productsTotals = document.getElementById("totals-content")
+    productsTotals.innerHTML = "";
     const totalNutriments = document.createElement("p");
     totalNutriments.textContent = 
     `Kcal: ${mealTotals.kcal || 0}, 
@@ -42,8 +64,8 @@ export function renderTotals(mealTotals){
 }
 
 export function renderTargets(dailyTargets, remainingTargets){
-    const targetSection = document.getElementById("targets");
-
+    const targetSection = document.getElementById("targets-content");
+    targetSection.innerHTML = "";
     const myDailyTargets = document.createElement("p");
     myDailyTargets.textContent = 
     `Daily Targets: ${dailyTargets.kcal} kcal,
