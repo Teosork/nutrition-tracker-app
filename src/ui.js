@@ -5,18 +5,21 @@ export function renderProducts(products,calculateProductNutrition, updateSummary
         const productCard = document.createElement("div");
         const productName = document.createElement("h3");
         productName.textContent = product.name;
+
         const productNutriments = document.createElement("p");
         productNutriments.textContent = 
-        `Kcal: ${product.kcal || 0}, 
+        `Per 100g: Kcal: ${product.kcal || 0}, 
         Fat: ${product.fat || 0}g,
         Carbs: ${product.carbs || 0}g,
         Protein: ${product.protein || 0}g`;
+
         const productCalculatedNutriments = document.createElement("p");
         productCalculatedNutriments.textContent =
-        `Kcal: ${product.calculatedKcal || 0}, 
+        `For ${product.grams}g: Kcal: ${product.calculatedKcal || 0}, 
         Fat: ${product.calculatedFat || 0}g,
         Carbs: ${product.calculatedCarbs || 0}g,
         Protein: ${product.calculatedProtein || 0}g`;
+
         const productUserGrams = document.createElement("label");
         productUserGrams.textContent = "Grams used: ";
         const productUserGramsInput = document.createElement("input");
@@ -27,7 +30,7 @@ export function renderProducts(products,calculateProductNutrition, updateSummary
             calculateProductNutrition(product);
             updateSummary();
             productCalculatedNutriments.textContent =
-            `Kcal: ${product.calculatedKcal || 0}, 
+            `For ${product.grams}g: Kcal: ${product.calculatedKcal || 0}, 
             Fat: ${product.calculatedFat || 0}g,
             Carbs: ${product.calculatedCarbs || 0}g,
             Protein: ${product.calculatedProtein || 0}g`;
