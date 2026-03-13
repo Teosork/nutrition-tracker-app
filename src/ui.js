@@ -24,7 +24,7 @@ export function renderMissingProducts(failedBarcodes){
     for (const barcode of failedBarcodes){
         const missingBarcodeCard = document.createElement("div");
         const missingBarcodeName = document.createElement("p");
-        missingBarcodeName.textContent = `Barcode not found: ${barcode}`;
+        missingBarcodeName.textContent = barcode;
         missingBarcodeCard.append(missingBarcodeName);
         myMissingProducts.append(missingBarcodeCard);
     }
@@ -53,9 +53,13 @@ export function renderTargets(dailyTargets, remainingTargets){
 
     const myRemainingTargets = document.createElement("p");
     myRemainingTargets.textContent = 
-    `Remaining: ${remainingTargets.kcal.toFixed(1)} kcal,
-    ${remainingTargets.fat.toFixed(1)}g fat,
-    ${remainingTargets.carbs.toFixed(1)}g carbs,
-    ${remainingTargets.protein.toFixed(1)}g protein`;
+    `Remaining: ${formatNumber(remainingTargets.kcal)} kcal,
+    ${formatNumber(remainingTargets.fat)}g fat,
+    ${formatNumber(remainingTargets.carbs)}g carbs,
+    ${formatNumber(remainingTargets.protein)}g protein`;
     targetSection.append(myDailyTargets,myRemainingTargets);
+}
+
+function formatNumber(value) {
+    return Number.isInteger(value) ? value : value.toFixed(1);
 }
