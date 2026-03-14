@@ -12,6 +12,7 @@ function extractProductData(productData) {
         fat: productData.product?.nutriments?.fat_100g,
         carbs: productData.product?.nutriments?.carbohydrates_100g,
         protein: productData.product?.nutriments?.proteins_100g,
+        nutritionDataPer: parseInt(productData.product?.nutrition_data_per || "100"),
         grams: 0
     };
 }
@@ -29,10 +30,11 @@ for (const barcode of barcodes){
 renderMissingProducts(failedBarcodes);
 
 function calculateProductNutrition(product) {
-    product.calculatedKcal = ((product.kcal || 0) * product.grams) / 100;
-    product.calculatedFat = ((product.fat || 0) * product.grams) / 100;
-    product.calculatedCarbs = ((product.carbs || 0) * product.grams) / 100;
-    product.calculatedProtein = ((product.protein || 0) * product.grams) / 100;
+    const base = product.nutritionDataPer || 100;
+    product.calculatedKcal = ((product.kcal || 0) * product.grams) / base;
+    product.calculatedFat = ((product.fat || 0) * product.grams) / base;
+    product.calculatedCarbs = ((product.carbs || 0) * product.grams) / base;
+    product.calculatedProtein = ((product.protein || 0) * product.grams) / base;
 }
 
 for (const product of products) {

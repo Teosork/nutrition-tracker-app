@@ -9,7 +9,7 @@ export function renderProducts(products,calculateProductNutrition, updateSummary
 
         const productNutriments = document.createElement("p");
         productNutriments.textContent = 
-        `Per 100g: Kcal: ${product.kcal || 0}, 
+        `Per ${product.nutritionDataPer}g: Kcal: ${product.kcal || 0}, 
         Fat: ${product.fat || 0}g,
         Carbs: ${product.carbs || 0}g,
         Protein: ${product.protein || 0}g`;
@@ -31,10 +31,10 @@ export function renderProducts(products,calculateProductNutrition, updateSummary
             calculateProductNutrition(product);
             updateSummary();
             productCalculatedNutriments.textContent =
-            `For ${product.grams}g: Kcal: ${product.calculatedKcal || 0}, 
-            Fat: ${product.calculatedFat || 0}g,
-            Carbs: ${product.calculatedCarbs || 0}g,
-            Protein: ${product.calculatedProtein || 0}g`;
+            `For ${formatNumber(product.grams)}g: Kcal: ${product.calculatedKcal || 0}, 
+            Fat: ${formatNumber(product.calculatedFat) || 0}g,
+            Carbs: ${formatNumber(product.calculatedCarbs) || 0}g,
+            Protein: ${formatNumber(product.calculatedProtein) || 0}g`;
         });
 
         productUserGrams.append(productUserGramsInput);
