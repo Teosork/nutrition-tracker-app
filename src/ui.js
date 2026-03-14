@@ -3,6 +3,7 @@ export function renderProducts(products,calculateProductNutrition, updateSummary
 
     for (const product of products) {
         const productCard = document.createElement("div");
+        productCard.classList.add("product-card");  
         const productName = document.createElement("h3");
         productName.textContent = product.name;
 

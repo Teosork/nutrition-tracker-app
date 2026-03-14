@@ -58,11 +58,43 @@ section:hover {
 
 section h2 {
     font-size: 1.25rem;
-    margin-bottom: 1.25rem;
     color: #2c3e50;
     display: flex;
     align-items: center;
     gap: 0.75rem;
+}
+
+.product-card {
+    padding: 0.50rem 0;
+    border-bottom: 1px solid #dcdfe4;
+}
+
+.product-card:last-child {
+    border-bottom: none;
+}
+
+.product-card p {
+    margin-bottom: 0.35rem;
+}
+
+.product-card h3 {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.75rem;
+    font-size: 1.1rem;
+}
+
+.product-card label {
+    font-weight: 500;
+    margin-right: 0.5rem;
+}
+
+.product-card input {
+    padding: 0.4rem 0.6rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    width: 80px;
 }
 
 .onDailyTarget {
