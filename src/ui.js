@@ -44,7 +44,18 @@ export function renderProducts(products,calculateProductNutrition, updateSummary
 }
 
 export function renderMissingProducts(failedBarcodes){
-    const  myMissingProducts = document.getElementById("missing-barcodes");
+    const myMissingProducts = document.getElementById("missing-barcodes");
+    
+    if (failedBarcodes.length === 0) {
+        myMissingProducts.innerHTML = "";
+        return;
+    }
+
+    const message = document.createElement("p");
+    message.style.marginBottom = "1rem";
+    message.textContent = `We couldn't find nutrition data for ${failedBarcodes.length} product(s). 
+    The barcode may be invalid or not in the Open Food Facts database.`;
+    myMissingProducts.appendChild(message);
 
     for (const barcode of failedBarcodes){
         const missingBarcodeCard = document.createElement("div");
