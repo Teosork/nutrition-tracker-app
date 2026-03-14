@@ -69,6 +69,7 @@ export function renderTotals(mealTotals){
 export function renderTargets(dailyTargets, remainingTargets){
     const targetSection = document.getElementById("targets-content");
     targetSection.innerHTML = "";
+
     const myDailyTargets = document.createElement("p");
     myDailyTargets.textContent = 
     `Daily Targets: ${dailyTargets.kcal} kcal,
@@ -76,14 +77,22 @@ export function renderTargets(dailyTargets, remainingTargets){
     ${dailyTargets.carbs}g carbs,
     ${dailyTargets.protein}g protein`;
 
+    const kcalClass = remainingTargets.kcal >= 0 ? "onDailyTarget" : "offDailyTarget";
+    const fatClass = remainingTargets.fat >= 0 ? "onDailyTarget" : "offDailyTarget";
+    const carbsClass = remainingTargets.carbs >= 0 ? "onDailyTarget" : "offDailyTarget";
+    const proteinClass = remainingTargets.protein >= 0 ? "onDailyTarget" : "offDailyTarget";
+
     const myRemainingTargets = document.createElement("p");
-    myRemainingTargets.textContent = 
-    `Remaining: ${formatNumber(remainingTargets.kcal)} kcal,
-    ${formatNumber(remainingTargets.fat)}g fat,
-    ${formatNumber(remainingTargets.carbs)}g carbs,
-    ${formatNumber(remainingTargets.protein)}g protein`;
-    targetSection.append(myDailyTargets,myRemainingTargets);
+    myRemainingTargets.innerHTML =
+    `Remaining: 
+    <span class="${kcalClass}">${formatNumber(remainingTargets.kcal)} kcal</span>,
+    <span class="${fatClass}">${formatNumber(remainingTargets.fat)}g fat</span>,
+    <span class="${carbsClass}">${formatNumber(remainingTargets.carbs)}g carbs</span>,
+    <span class="${proteinClass}">${formatNumber(remainingTargets.protein)}g protein</span>`;
+
+    targetSection.append(myDailyTargets, myRemainingTargets);
 }
+
 
 function formatNumber(value) {
     return Number.isInteger(value) ? value : value.toFixed(1);
