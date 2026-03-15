@@ -1,4 +1,4 @@
-export function renderProducts(products,calculateProductNutrition, updateSummary){
+export function renderProducts(products, calculateProductNutrition, updateSummary){
     const myProducts = document.getElementById("products");
 
     for (const product of products) {
@@ -8,18 +8,22 @@ export function renderProducts(products,calculateProductNutrition, updateSummary
         productName.textContent = product.name;
 
         const productNutriments = document.createElement("p");
-        productNutriments.textContent = 
-        `Per ${product.nutritionDataPer}g: Kcal: ${product.kcal || 0}, 
-        Fat: ${product.fat || 0}g,
-        Carbs: ${product.carbs || 0}g,
-        Protein: ${product.protein || 0}g`;
+        productNutriments.textContent = createNutritionText(
+            product.nutritionDataPer,
+            product.kcal,
+            product.fat,
+            product.carbs,
+            product.protein
+        );
 
         const productCalculatedNutriments = document.createElement("p");
-        productCalculatedNutriments.textContent =
-        `For ${product.grams}g: Kcal: ${product.calculatedKcal || 0}, 
-        Fat: ${product.calculatedFat || 0}g,
-        Carbs: ${product.calculatedCarbs || 0}g,
-        Protein: ${product.calculatedProtein || 0}g`;
+        productCalculatedNutriments.textContent = createNutritionText(
+            product.grams,
+            product.calculatedKcal,
+            product.calculatedFat,
+            product.calculatedCarbs,
+            product.calculatedProtein
+        );
 
         const productUserGrams = document.createElement("label");
         productUserGrams.textContent = "Grams used: ";
@@ -35,16 +39,17 @@ export function renderProducts(products,calculateProductNutrition, updateSummary
                 product.grams = 0;
                 productUserGramsInput.value = 0;
             }
-            
+
             calculateProductNutrition(product);
             updateSummary();
-            productCalculatedNutriments.textContent =
-            `For ${formatNumber(product.grams)}g: Kcal: ${product.calculatedKcal || 0}, 
-            Fat: ${formatNumber(product.calculatedFat) || 0}g,
-            Carbs: ${formatNumber(product.calculatedCarbs) || 0}g,
-            Protein: ${formatNumber(product.calculatedProtein) || 0}g`;
+            productCalculatedNutriments.textContent = createNutritionText(
+                product.grams,
+                product.calculatedKcal,
+                product.calculatedFat,
+                product.calculatedCarbs,
+                product.calculatedProtein
+            );
         });
-
         productUserGrams.append(productUserGramsInput);
         productCard.append(productName, productNutriments, productCalculatedNutriments, productUserGrams);
         myProducts.append(productCard);
@@ -113,7 +118,14 @@ export function renderTargets(dailyTargets, remainingTargets){
     targetSection.append(myDailyTargets, myRemainingTargets);
 }
 
+function createNutritionText(grams, kcal, fat, carbs, protein) {
+    return `For ${formatNumber(grams)}g: 
+            Kcal: ${formatNumber(kcal || 0)}, 
+            Fat: ${formatNumber(fat || 0)}g, 
+            Carbs: ${formatNumber(carbs || 0)}g, 
+            Protein: ${formatNumber(protein || 0)}g`;
+}
 
-function formatNumber(value) {
+export function formatNumber(value) {
     return Number.isInteger(value) ? value : value.toFixed(1);
 }
