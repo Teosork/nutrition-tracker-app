@@ -1,6 +1,6 @@
 import { barcodes, dailyTargets } from "./data.js";
-import { fetchProduct } from "./api.js";
-import { renderProducts, renderMissingProducts, renderTotals, renderTargets} from "./ui.js";
+import { fetchProductWithRetry } from "./api.js";
+import { renderProducts, renderMissingProducts, renderTotals, renderTargets } from "./ui.js";
 
 const products = [];
 const failedBarcodes = [];
@@ -17,14 +17,18 @@ function extractProductData(productData) {
     };
 }
 
-for (const barcode of barcodes){
+for (const barcode of barcodes) {
     try {
-    const productData = await fetchProduct(barcode);
-    const product = extractProductData(productData);
-    products.push(product);
-    } catch (error){
-    failedBarcodes.push(barcode);
-    console.error('An error occurred while fetching data: ', error.message);    
+        const productData = await fetchProductWithRetry(barcode);
+        const product = extractProductData(productData);
+        products.push(product);
+    } catch (error) {
+        failedBarcodes.push(barcode);
+        if (error.status === 404) {
+            console.warn(`Barcode not found: ${barcode}`);
+        } else {
+            console.error(`Failed to fetch ${barcode}: ${error.message}`);
+        }
     }
 }
 renderMissingProducts(failedBarcodes);
