@@ -26,8 +26,16 @@ export function renderProducts(products,calculateProductNutrition, updateSummary
         const productUserGramsInput = document.createElement("input");
         productUserGramsInput.type = "number";
         productUserGramsInput.value = product.grams;
+        productUserGramsInput.min = "0";
+        productUserGramsInput.step = "1"; 
         productUserGramsInput.addEventListener("input", function () {
             product.grams = Number(productUserGramsInput.value);
+
+            if (isNaN(product.grams) || product.grams < 0) {
+                product.grams = 0;
+                productUserGramsInput.value = 0;
+            }
+            
             calculateProductNutrition(product);
             updateSummary();
             productCalculatedNutriments.textContent =
