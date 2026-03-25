@@ -1,4 +1,4 @@
-import { barcodes, dailyTargets } from "./data.js";
+import { barcodes, dailyTargets, nutriments } from "./data.js";
 import { fetchProductWithRetry } from "./api.js";
 import { renderProducts, renderMissingProducts, renderTotals, renderTargets } from "./ui.js";
 
@@ -8,10 +8,10 @@ const failedBarcodes = [];
 function extractProductData(productData) {
     return {
         name: productData.product?.product_name,
-        kcal: productData.product?.nutriments?.["energy-kcal_100g"],
-        fat: productData.product?.nutriments?.fat_100g,
-        carbs: productData.product?.nutriments?.carbohydrates_100g,
-        protein: productData.product?.nutriments?.proteins_100g,
+        ...nutriments.reduce((acc, { key, apiKey }) => {
+            acc[key] = productData.product?.nutriments?.[apiKey];
+            return acc;
+        }, {}),
         nutritionDataPer: parseInt(productData.product?.nutrition_data_per || "100"),
         grams: 0
     };
@@ -35,57 +35,50 @@ renderMissingProducts(failedBarcodes);
 
 function calculateProductNutrition(product) {
     const base = product.nutritionDataPer || 100;
-    product.calculatedKcal = ((product.kcal || 0) * product.grams) / base;
-    product.calculatedFat = ((product.fat || 0) * product.grams) / base;
-    product.calculatedCarbs = ((product.carbs || 0) * product.grams) / base;
-    product.calculatedProtein = ((product.protein || 0) * product.grams) / base;
+    product.calculated = nutriments.reduce((acc, { key }) => {
+        acc[key] = ((product[key] || 0) * product.grams) / base;
+        return acc;
+    }, {})
 }
 
 for (const product of products) {
     calculateProductNutrition(product);
 }
+const mealTotals = nutriments.reduce((acc, { key }) => {
+    acc[key] = 0;
+    return acc;
+}, {})
 
-const mealTotals = {
-    kcal: 0,
-    fat: 0,
-    carbs: 0,
-    protein: 0
-};
 
 function calculateMealTotals(products, mealTotals) {
-    mealTotals.kcal = 0;
-    mealTotals.fat = 0;
-    mealTotals.carbs = 0;
-    mealTotals.protein = 0;
+    nutriments.forEach(({ key }) => {
+        mealTotals[key] = 0;
+    });
 
     for (const product of products) {
-        mealTotals.kcal += product.calculatedKcal || 0;
-        mealTotals.fat += product.calculatedFat || 0;
-        mealTotals.carbs += product.calculatedCarbs || 0;
-        mealTotals.protein += product.calculatedProtein || 0;
+        nutriments.forEach(({ key }) => {
+            mealTotals[key] += product.calculated[key] || 0;
+        });
     }
 }
 
-const remainingTargets = {
-    kcal: 0,
-    fat: 0,
-    carbs: 0,
-    protein: 0
-};
+const remainingTargets = nutriments.reduce((acc, { key }) => {
+    acc[key] = 0;
+    return acc;
+}, {})
 
 function calculateRemainingTargets(dailyTargets, mealTotals, remainingTargets) {
-    remainingTargets.kcal = dailyTargets.kcal - mealTotals.kcal;
-    remainingTargets.fat = dailyTargets.fat - mealTotals.fat;
-    remainingTargets.carbs = dailyTargets.carbs - mealTotals.carbs;
-    remainingTargets.protein = dailyTargets.protein - mealTotals.protein;
+    nutriments.forEach(({key}) => {
+           remainingTargets[key] = dailyTargets[key] - mealTotals[key];
+    });
 }
 
 function updateSummary() {
     calculateMealTotals(products, mealTotals);
-    renderTotals(mealTotals);
+    renderTotals(mealTotals, nutriments);
     calculateRemainingTargets(dailyTargets, mealTotals, remainingTargets);
-    renderTargets(dailyTargets, remainingTargets);
+    renderTargets(dailyTargets, remainingTargets, nutriments);
 }
 
 updateSummary();
-renderProducts(products, calculateProductNutrition, updateSummary);
+renderProducts(products, calculateProductNutrition, updateSummary, nutriments);
