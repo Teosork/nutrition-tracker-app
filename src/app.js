@@ -33,50 +33,41 @@ for (const barcode of barcodes) {
 }
 renderMissingProducts(failedBarcodes);
 
-function calculateProductNutrition(product) {
+function calculateProductNutrition(product, nutriments) {
     const base = product.nutritionDataPer || 100;
-    product.calculated = nutriments.reduce((acc, { key }) => {
+    return nutriments.reduce((acc, { key }) => {
         acc[key] = ((product[key] || 0) * product.grams) / base;
         return acc;
-    }, {})
+    }, {});
 }
 
 for (const product of products) {
-    calculateProductNutrition(product);
+    product.calculated = calculateProductNutrition(product, nutriments);
 }
-const mealTotals = nutriments.reduce((acc, { key }) => {
-    acc[key] = 0;
-    return acc;
-}, {})
 
-
-function calculateMealTotals(products, mealTotals) {
+function calculateMealTotals(products, nutriments) {
+    const mealTotals = {};
     nutriments.forEach(({ key }) => {
         mealTotals[key] = 0;
-    });
-
-    for (const product of products) {
-        nutriments.forEach(({ key }) => {
+        products.forEach(product => {
             mealTotals[key] += product.calculated[key] || 0;
         });
-    }
+    });
+    return mealTotals;
 }
 
-const remainingTargets = nutriments.reduce((acc, { key }) => {
-    acc[key] = 0;
-    return acc;
-}, {})
-
-function calculateRemainingTargets(dailyTargets, mealTotals, remainingTargets) {
-    nutriments.forEach(({key}) => {
-           remainingTargets[key] = dailyTargets[key] - mealTotals[key];
-    });
+function calculateRemainingTargets(dailyTargets, mealTotals, nutriments) {
+    return nutriments.reduce((acc, { key }) => {
+        acc[key] = (dailyTargets[key] || 0) - (mealTotals[key] || 0);
+        return acc;
+    }, {});
 }
 
 function updateSummary() {
-    calculateMealTotals(products, mealTotals);
+    const mealTotals = calculateMealTotals(products, nutriments);
     renderTotals(mealTotals, nutriments);
-    calculateRemainingTargets(dailyTargets, mealTotals, remainingTargets);
+
+    const remainingTargets = calculateRemainingTargets(dailyTargets, mealTotals, nutriments);
     renderTargets(dailyTargets, remainingTargets, nutriments);
 }
 
