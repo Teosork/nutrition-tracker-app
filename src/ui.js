@@ -36,7 +36,7 @@ export function renderProducts(products, calculateProductNutrition, updateSummar
                 productUserGramsInput.value = 0;
             }
 
-            calculateProductNutrition(product);
+            product.calculated = calculateProductNutrition(product, nutriments);
             updateSummary();
             productCalculatedNutriments.textContent = createNutritionText(
                 product.grams,
