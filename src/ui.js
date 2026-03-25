@@ -1,4 +1,4 @@
-export function renderProducts(products, calculateProductNutrition, updateSummary){
+export function renderProducts(products, calculateProductNutrition, updateSummary, nutriments){
     const myProducts = document.getElementById("products");
 
     for (const product of products) {
@@ -10,19 +10,15 @@ export function renderProducts(products, calculateProductNutrition, updateSummar
         const productNutriments = document.createElement("p");
         productNutriments.textContent = createNutritionText(
             product.nutritionDataPer,
-            product.kcal,
-            product.fat,
-            product.carbs,
-            product.protein
+            product,
+            nutriments
         );
 
         const productCalculatedNutriments = document.createElement("p");
         productCalculatedNutriments.textContent = createNutritionText(
             product.grams,
-            product.calculatedKcal,
-            product.calculatedFat,
-            product.calculatedCarbs,
-            product.calculatedProtein
+            product.calculated,
+            nutriments
         );
 
         const productUserGrams = document.createElement("label");
@@ -44,10 +40,8 @@ export function renderProducts(products, calculateProductNutrition, updateSummar
             updateSummary();
             productCalculatedNutriments.textContent = createNutritionText(
                 product.grams,
-                product.calculatedKcal,
-                product.calculatedFat,
-                product.calculatedCarbs,
-                product.calculatedProtein
+                product.calculated,
+                nutriments  
             );
         });
         productUserGrams.append(productUserGramsInput);
@@ -79,51 +73,36 @@ export function renderMissingProducts(failedBarcodes){
     }
 }
 
-export function renderTotals(mealTotals){
-    const productsTotals = document.getElementById("totals-content")
+export function renderTotals(mealTotals, nutriments){
+    const productsTotals = document.getElementById("totals-content");
     productsTotals.innerHTML = "";
     const totalNutriments = document.createElement("p");
-    totalNutriments.textContent = 
-    `Kcal: ${formatNumber(mealTotals.kcal)}, 
-    Fat: ${formatNumber(mealTotals.fat)}g,
-    Carbs: ${formatNumber(mealTotals.carbs)}g,
-    Protein: ${formatNumber(mealTotals.protein)}g`;
+    totalNutriments.textContent = nutriments.map(({ key, label, unit }) => 
+        `${label}: ${formatNumber(mealTotals[key])}${unit}`).join(", ");
     productsTotals.append(totalNutriments);
 }
 
-export function renderTargets(dailyTargets, remainingTargets){
+export function renderTargets(dailyTargets, remainingTargets, nutriments){
     const targetSection = document.getElementById("targets-content");
     targetSection.innerHTML = "";
 
     const myDailyTargets = document.createElement("p");
-    myDailyTargets.textContent = 
-    `Daily Targets: ${dailyTargets.kcal} kcal,
-    ${dailyTargets.fat}g fat,
-    ${dailyTargets.carbs}g carbs,
-    ${dailyTargets.protein}g protein`;
-
-    const kcalClass = remainingTargets.kcal >= 0 ? "onDailyTarget" : "offDailyTarget";
-    const fatClass = remainingTargets.fat >= 0 ? "onDailyTarget" : "offDailyTarget";
-    const carbsClass = remainingTargets.carbs >= 0 ? "onDailyTarget" : "offDailyTarget";
-    const proteinClass = remainingTargets.protein >= 0 ? "onDailyTarget" : "offDailyTarget";
+    myDailyTargets.textContent = "Daily Targets: " + nutriments.map(({ key, label, unit }) => 
+        `${dailyTargets[key]}${unit} ${label}`).join(", ");
 
     const myRemainingTargets = document.createElement("p");
-    myRemainingTargets.innerHTML =
-    `Remaining: 
-    <span class="${kcalClass}">${formatNumber(remainingTargets.kcal)} kcal</span>,
-    <span class="${fatClass}">${formatNumber(remainingTargets.fat)}g fat</span>,
-    <span class="${carbsClass}">${formatNumber(remainingTargets.carbs)}g carbs</span>,
-    <span class="${proteinClass}">${formatNumber(remainingTargets.protein)}g protein</span>`;
+    myRemainingTargets.innerHTML = "Remaining: " + nutriments.map(({ key, label, unit }) => {
+        const cssClass = remainingTargets[key] >= 0 ? "onDailyTarget" : "offDailyTarget";
+        return `<span class="${cssClass}">${formatNumber(remainingTargets[key])}${unit} ${label}</span>`;
+    }).join(", ");
 
     targetSection.append(myDailyTargets, myRemainingTargets);
 }
 
-function createNutritionText(grams, kcal, fat, carbs, protein) {
-    return `For ${formatNumber(grams)}g: 
-            Kcal: ${formatNumber(kcal || 0)}, 
-            Fat: ${formatNumber(fat || 0)}g, 
-            Carbs: ${formatNumber(carbs || 0)}g, 
-            Protein: ${formatNumber(protein || 0)}g`;
+function createNutritionText(grams, product, nutriments) {
+    return `For ${formatNumber(grams)}g: `
+            + nutriments.map(({ key, label, unit }) =>
+            `${label}: ${formatNumber(product[key] || 0)}${unit}`).join(", ");
 }
 
 export function formatNumber(value) {

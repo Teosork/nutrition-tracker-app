@@ -11,7 +11,14 @@
     kcal: 2400,
     fat: 70,
     carbs: 220,
-    protein: 190
+    protein: 190,
  };
+
+ const nutriments = [
+  { key: "kcal",    label: "Calories", apiKey: "energy-kcal_100g",    unit: "kcal" },
+  { key: "fat",     label: "Fat",      apiKey: "fat_100g",            unit: "g"    },
+  { key: "carbs",   label: "Carbs",    apiKey: "carbohydrates_100g",  unit: "g"    },
+  { key: "protein", label: "Protein",  apiKey: "proteins_100g",       unit: "g"    },
+]
  
- export {barcodes, dailyTargets};
+ export {barcodes, dailyTargets, nutriments};
