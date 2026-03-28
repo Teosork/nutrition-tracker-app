@@ -1,0 +1,24 @@
+{
+  "name": "nutrition-tracker-app",
+  "version": "1.0.0",
+  "description": "A web application that helps users track their daily intake by using product barcodes and nutrition data from Open Food Facts.",
+  "main": "index.js",
+  "scripts": {
+    "test": "vitest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Teosork/nutrition-tracker-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Teosork/nutrition-tracker-app/issues"
+  },
+  "homepage": "https://github.com/Teosork/nutrition-tracker-app#readme",
+  "devDependencies": {
+    "vitest": "^4.1.2"
+  }
+}

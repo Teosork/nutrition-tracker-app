@@ -17,23 +17,7 @@ function extractProductData(productData) {
     };
 }
 
-for (const barcode of barcodes) {
-    try {
-        const productData = await fetchProductWithRetry(barcode);
-        const product = extractProductData(productData);
-        products.push(product);
-    } catch (error) {
-        failedBarcodes.push(barcode);
-        if (error.status === 404) {
-            console.warn(`Barcode not found: ${barcode}`);
-        } else {
-            console.error(`Failed to fetch ${barcode}: ${error.message}`);
-        }
-    }
-}
-renderMissingProducts(failedBarcodes);
-
-function calculateProductNutrition(product, nutriments) {
+export function calculateProductNutrition(product, nutriments) {
     const base = product.nutritionDataPer || 100;
     return nutriments.reduce((acc, { key }) => {
         acc[key] = ((product[key] || 0) * product.grams) / base;
@@ -41,11 +25,7 @@ function calculateProductNutrition(product, nutriments) {
     }, {});
 }
 
-for (const product of products) {
-    product.calculated = calculateProductNutrition(product, nutriments);
-}
-
-function calculateMealTotals(products, nutriments) {
+export function calculateMealTotals(products, nutriments) {
     const mealTotals = {};
     nutriments.forEach(({ key }) => {
         mealTotals[key] = 0;
@@ -56,7 +36,7 @@ function calculateMealTotals(products, nutriments) {
     return mealTotals;
 }
 
-function calculateRemainingTargets(dailyTargets, mealTotals, nutriments) {
+export function calculateRemainingTargets(dailyTargets, mealTotals, nutriments) {
     return nutriments.reduce((acc, { key }) => {
         acc[key] = (dailyTargets[key] || 0) - (mealTotals[key] || 0);
         return acc;
@@ -71,5 +51,31 @@ function updateSummary() {
     renderTargets(dailyTargets, remainingTargets, nutriments);
 }
 
-updateSummary();
-renderProducts(products, calculateProductNutrition, updateSummary, nutriments);
+async function initializeApp() {
+    for (const barcode of barcodes) {
+        try {
+            const productData = await fetchProductWithRetry(barcode);
+            const product = extractProductData(productData);
+            products.push(product);
+        } catch (error) {
+            failedBarcodes.push(barcode);
+            if (error.status === 404) {
+                console.warn(`Barcode not found: ${barcode}`);
+            } else {
+                console.error(`Failed to fetch ${barcode}: ${error.message}`);
+            }
+        }
+    }
+    renderMissingProducts(failedBarcodes);
+    
+    for (const product of products) {
+        product.calculated = calculateProductNutrition(product, nutriments);
+    }
+    
+    updateSummary();
+    renderProducts(products, calculateProductNutrition, updateSummary, nutriments);
+}
+
+if (typeof document !== 'undefined') {
+    initializeApp();
+}
