@@ -107,6 +107,50 @@ section h2 {
     font-weight: 600;
 }
 
+button {
+    border: 0;
+    border-radius: 10px;
+    padding: 0.55rem 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.04s ease, opacity 0.2s ease, background-color 0.2s ease;
+}
+
+button:active {
+    transform: translateY(1px);
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+#barcode-form button[type="submit"] {
+    background: #2563eb;
+    color: #fff;
+}
+
+#barcode-form button[type="submit"]:hover:not(:disabled) {
+    background: #1d4ed8;
+}
+
+.product-card button[type="button"] {
+    background: #fee2e2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+}
+
+.product-card button[type="button"]:hover {
+    background: #fecaca;
+}
+
+#barcode-input {
+    padding: 0.4rem 0.6rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.95rem;
+}
+
 @media (min-width: 768px) {
     main {
         grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));

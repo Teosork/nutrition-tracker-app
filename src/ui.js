@@ -1,5 +1,8 @@
-export function renderProducts(products, calculateProductNutrition, updateSummary, nutriments){
+export function renderProducts(products, calculateProductNutrition, updateSummary, nutriments, onDeleteProduct){
     const myProducts = document.getElementById("products");
+    if (!myProducts) return;
+
+    myProducts.querySelectorAll(".product-card").forEach((card) => card.remove());
 
     for (const product of products) {
         const productCard = document.createElement("div");
@@ -45,33 +48,40 @@ export function renderProducts(products, calculateProductNutrition, updateSummar
             );
         });
         productUserGrams.append(productUserGramsInput);
-        productCard.append(productName, productNutriments, productCalculatedNutriments, productUserGrams);
+        const deleteButton = document.createElement("button");
+        deleteButton.type = "button";
+        deleteButton.textContent = "Delete";
+
+        deleteButton.addEventListener("click", () => {
+            if (onDeleteProduct) onDeleteProduct(product.id);
+        });
+        productCard.append(productName, productNutriments, productCalculatedNutriments, productUserGrams, deleteButton);
         myProducts.append(productCard);
     }
 }
 
-export function renderMissingProducts(failedBarcodes){
-    const myMissingProducts = document.getElementById("missing-barcodes");
+// export function renderMissingProducts(failedBarcodes){
+//     const myMissingProducts = document.getElementById("missing-barcodes");
     
-    if (failedBarcodes.length === 0) {
-        myMissingProducts.innerHTML = "";
-        return;
-    }
+//     if (failedBarcodes.length === 0) {
+//         myMissingProducts.innerHTML = "";
+//         return;
+//     }
 
-    const message = document.createElement("p");
-    message.style.marginBottom = "1rem";
-    message.textContent = `We couldn't find nutrition data for ${failedBarcodes.length} product(s). 
-    The barcode may be invalid or not in the Open Food Facts database.`;
-    myMissingProducts.appendChild(message);
+//     const message = document.createElement("p");
+//     message.style.marginBottom = "1rem";
+//     message.textContent = `We couldn't find nutrition data for ${failedBarcodes.length} product(s). 
+//     The barcode may be invalid or not in the Open Food Facts database.`;
+//     myMissingProducts.appendChild(message);
 
-    for (const barcode of failedBarcodes){
-        const missingBarcodeCard = document.createElement("div");
-        const missingBarcodeName = document.createElement("p");
-        missingBarcodeName.textContent = barcode;
-        missingBarcodeCard.append(missingBarcodeName);
-        myMissingProducts.append(missingBarcodeCard);
-    }
-}
+//     for (const barcode of failedBarcodes){
+//         const missingBarcodeCard = document.createElement("div");
+//         const missingBarcodeName = document.createElement("p");
+//         missingBarcodeName.textContent = barcode;
+//         missingBarcodeCard.append(missingBarcodeName);
+//         myMissingProducts.append(missingBarcodeCard);
+//     }
+// }
 
 export function renderTotals(mealTotals, nutriments){
     const productsTotals = document.getElementById("totals-content");
