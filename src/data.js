@@ -6,10 +6,10 @@ const dailyTargets = {
 };
 
 const nutriments = [
-  { key: "kcal",    label: "Calories", apiKey: "energy-kcal_100g",    unit: "kcal" },
-  { key: "fat",     label: "Fat",      apiKey: "fat_100g",            unit: "g"    },
-  { key: "carbs",   label: "Carbs",    apiKey: "carbohydrates_100g",  unit: "g"    },
-  { key: "protein", label: "Protein",  apiKey: "proteins_100g",       unit: "g"    },
-]
- 
+  { key: "kcal",    label: "Calories",  keyPer100: "energy-kcal_100g",    keyPerServing: "energy-kcal_serving",   unit: "kcal" },
+  { key: "fat",     label: "Fat",       keyPer100: "fat_100g",            keyPerServing: "fat_serving",           unit: "g" },
+  { key: "carbs",   label: "Carbs",     keyPer100: "carbohydrates_100g",  keyPerServing: "carbohydrates_serving", unit: "g" },
+  { key: "protein", label: "Protein",   keyPer100: "proteins_100g",       keyPerServing: "proteins_serving",      unit: "g" },
+];
+
 export { dailyTargets, nutriments };

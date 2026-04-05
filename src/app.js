@@ -5,25 +5,86 @@ import { renderProducts, renderTotals, renderTargets } from "./ui.js";
 const products = [];
 
 function extractProductData(productData, barcode) {
+    const { basisAmount, basisUnit } = parseBasis(productData.product?.nutrition_data_per);
+    const { servingAmount, servingUnit } = parseServingSize(productData.product?.serving_size);
+
+    const per100 = nutriments.reduce((acc, { key, keyPer100 }) => {
+        acc[key] = productData.product?.nutriments?.[keyPer100] ?? null;
+        return acc;
+    }, {});
+
+    const perServing = nutriments.reduce((acc, { key, keyPerServing }) => {
+        acc[key] = productData.product?.nutriments?.[keyPerServing] ?? null;
+        return acc;
+    }, {});
+
     return {
         id: crypto.randomUUID(),
         barcode,
-        name: productData.product?.product_name,
-        ...nutriments.reduce((acc, { key, apiKey }) => {
-            acc[key] = productData.product?.nutriments?.[apiKey];
-            return acc;
-        }, {}),
-        nutritionDataPer: parseInt(productData.product?.nutrition_data_per || "100"),
-        grams: 0
+        name: productData.product?.product_name || `Unknown product (${barcode})`,
+        basisAmount,
+        basisUnit,
+        servingSize: productData.product?.serving_size || null,
+        servingAmount,
+        servingUnit,
+        per100,
+        perServing,
+        inputAmount: null,
+        inputUnit: null,
+        calculated: null
     };
 }
 
+function parseBasis(raw) {
+    const match = (raw || "").match(/(\d+\.?\d*)\s*(g|ml)/i);
+    return {
+        basisAmount: match ? parseFloat(match[1]) : 100,
+        basisUnit:   match ? match[2].toLowerCase() : "g"
+    };
+}
+
+function parseServingSize(raw) {
+    if (!raw) return { servingAmount: null, servingUnit: null };
+    const parenMatch = raw.match(/\((\d+\.?\d*)\s*(g|ml)\)/i);
+    if (parenMatch) return { servingAmount: parseFloat(parenMatch[1]), servingUnit: parenMatch[2].toLowerCase() };
+    const directMatch = raw.match(/^(\d+\.?\d*)\s*(g|ml)/i);
+    if (directMatch) return { servingAmount: parseFloat(directMatch[1]), servingUnit: directMatch[2].toLowerCase() };
+    return { servingAmount: null, servingUnit: null };
+}
+
 export function calculateProductNutrition(product, nutriments) {
-    const base = product.nutritionDataPer || 100;
-    return nutriments.reduce((acc, { key }) => {
-        acc[key] = ((product[key] || 0) * product.grams) / base;
-        return acc;
-    }, {});
+    if (product.inputAmount === null || product.inputAmount <= 0) return null;
+
+    if (product.inputUnit === "serving") {
+        return nutriments.reduce((acc, { key }) => {
+            const perServingValue = product.perServing?.[key];
+            if (perServingValue != null) {
+                acc[key] = perServingValue * product.inputAmount;
+                return acc;
+            }
+
+            const canFallbackToBasis =
+                product.servingAmount != null &&
+                product.servingUnit === product.basisUnit &&
+                product.per100?.[key] != null &&
+                product.basisAmount > 0;
+
+            acc[key] = canFallbackToBasis
+                ? (product.per100[key] * product.servingAmount / product.basisAmount) * product.inputAmount
+                : 0;
+
+            return acc;
+        }, {});
+    }
+
+    if (product.inputUnit === product.basisUnit) {
+        return nutriments.reduce((acc, { key }) => {
+            acc[key] = (product.per100[key] ?? 0) * product.inputAmount / product.basisAmount;
+            return acc;
+        }, {});
+    }
+
+    return null;
 }
 
 export function calculateMealTotals(products, nutriments) {
@@ -31,7 +92,9 @@ export function calculateMealTotals(products, nutriments) {
     nutriments.forEach(({ key }) => {
         mealTotals[key] = 0;
         products.forEach(product => {
-            mealTotals[key] += product.calculated[key] || 0;
+            if (product.calculated) {
+                mealTotals[key] += product.calculated[key] || 0;
+            }
         });
     });
     return mealTotals;
