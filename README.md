@@ -23,20 +23,6 @@ The goal of this project is to build a nutrition tracking app that fetches produ
 - JavaScript (ES6+)
 - Open Food Facts API
 
-## Project Structure
-
-```text
-nutrition-tracker/
-├── index.html
-├── style.css
-├── README.md
-└── src/
-    ├── app.js
-    ├── api.js
-    ├── data.js
-    └── ui.js
-```
-
 ## How to Run
 
 This project uses JavaScript modules, so it should be run through a local server or through the GitHub Pages live link.  
@@ -79,4 +65,4 @@ https://teosork.github.io/nutrition-tracker-app/
 - Support different units of measurement and serving sizes, since manual input would need more flexible calculation logic
 - Save meals with localStorage to avoid losing progress and reduce repeated fetching during use
 - Support multiple meals instead of only one meal view
-- In a later version, add multiple users and a database to store and manage user-specific nutrition data. At that point, it would make sense to migrate to a front-end framework (React) for better state management and UI structure.
+- In a later version, add multiple users and a database to store and manage user-specific nutrition data.
